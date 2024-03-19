@@ -1,5 +1,4 @@
-%% 1.打开simulink文件,展开成环境
-
+%% 1. Open Simulink file and create environment
 open_system('Env_cpl_buck')
 obsInfo = rlNumericSpec([6 1],...
     'LowerLimit',[-inf -inf  -inf -inf -inf  -inf]',...
@@ -7,21 +6,17 @@ obsInfo = rlNumericSpec([6 1],...
 obsInfo.Name = 'observations';
 obsInfo.Description = 'integrated error, error, and measured Vo';
 numObservations = obsInfo.Dimension(1);
-
 actInfo = rlFiniteSetSpec([0.44,0.45,0.46,0.47,0.48,0.49,0.50,0.51,0.52,0.53,0.54,0.55]);
 actInfo.Name = 'action';
 numActions = 12;
-
 env = rlSimulinkEnv('Env_cpl_buck','Env_cpl_buck/RL Agent',...
     obsInfo,actInfo);
 env.ResetFcn = @(in)localResetFcn(in);
-
 Ts = 0.0001;
 Tf = 0.4;
 rng(0)
 
-
-%% 2.搭建神经网络
+%% 2. Build neural network
 dnn = [
     imageInputLayer([obsInfo.Dimension(1) 1 1],...
     'Normalization', 'none', 'Name', 'State')
@@ -30,14 +25,11 @@ dnn = [
     fullyConnectedLayer(64, 'Name', 'CriticStateFC2')
     reluLayer('Name','CriticCommonRelu')
     fullyConnectedLayer(numActions, 'Name', 'output')];
-
-criticOptions = rlRepresentationOptions('LearnRate',1e-3,'GradientThreshold',1);%,'UseDevice','gpu'
-
+criticOptions = rlRepresentationOptions('LearnRate',1e-3,'GradientThreshold',1);
 critic = rlQValueRepresentation(dnn,obsInfo,actInfo, ...
     'Observation',{'State'},'Action',{'output'},criticOptions);
 
-
-%% 3.设置训练参数
+%% 3. Set training parameters
 agentOptions = rlDQNAgentOptions(...
     'SampleTime',Ts,...
     'UseDoubleDQN',true,...
@@ -49,8 +41,6 @@ agentOptions = rlDQNAgentOptions(...
 opt.EpsilonGreedyExploration.Epsilon = 1;
 opt.EpsilonGreedyExploration.EpsilonDecay = 0.001;
 opt.EpsilonGreedyExploration.EpsilonMin = 0.1;
-
-
 agent = rlDQNAgent(critic,agentOptions);
 maxepisodes = 200;
 maxsteps = ceil(Tf/Ts);
@@ -65,25 +55,23 @@ trainOpts = rlTrainingOptions(...
     'SaveAgentCriteria','EpisodeReward',...
     'SaveAgentValue',37000);
 
-%% 4.训练&加载模型
- %doTraining = true;
-doTraining = false;
+%% 4. Train & load model
+doTraining = true;
+%doTraining = false;
 if doTraining
     % Train the agent.
     trainingStats = train(agent,env,trainOpts);
-    save('text.mat','agent');
+    save('test.mat','agent');
 end
-
 if doTraining==false
     % Load pretrained agent for the example.
     load('282.mat','agent');
 end
    
-
 rlSimulationOptions('MaxSteps',maxsteps,'StopOnError','on');
 experiences = sim(env,agent,rlSimulationOptions);
 
-%% 5.reset部分,重置Vref
+%% 5. Reset function, reset Vref
 function in = localResetFcn(in)
 blk = sprintf('Env_cpl_buck/Desired Voltage');
 V = 100;
@@ -91,5 +79,4 @@ while V <= 60 || V >= 300
    V =  100;
 end
 in = setBlockParameter(in,blk,'Value',num2str(V));
-
 end
