@@ -6,8 +6,8 @@ Our focus is on developing a controller that can adaptively manage the dynamic e
 The methodology and experimental results presented in this repository are based on comprehensive studies detailed in the following papers:<br>
 
 **Paper 1:** [Voltage Regulation of DC-DC Buck Converters Feeding CPLs via Deep Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9521987)<br>
-**Paper 1:** [Implementation of Transferring Reinforcement Learning for DC–DC Buck Converter Control via Duty Ratio Mapping](https://ieeexplore.ieee.org/abstract/document/9841427)<br>
-**Paper 1:** [Robustness enhancement of DRL controller for DC–DC buck convertersfusing ESO](https://www.tandfonline.com/doi/full/10.1080/23307706.2023.2201587)<br>
+**Paper 2:** [Implementation of Transferring Reinforcement Learning for DC–DC Buck Converter Control via Duty Ratio Mapping](https://ieeexplore.ieee.org/abstract/document/9841427)<br>
+**Paper 3:** [Robustness enhancement of DRL controller for DC–DC buck convertersfusing ESO](https://www.tandfonline.com/doi/full/10.1080/23307706.2023.2201587)<br>
 These papers provide the theoretical foundation and empirical evidence supporting the effectiveness of deep reinforcement learning in controlling DC-DC converters with constant power loads.<br>
 
 # Prerequisites
